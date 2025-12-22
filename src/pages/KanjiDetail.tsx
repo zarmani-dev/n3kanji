@@ -7,8 +7,8 @@ import kanjiData from '@/data/n4kanji.json';
 import { useBookmarks } from '@/hooks/useBookmarks';
 import { useHideJapanese } from '@/hooks/useHideJapanese';
 
-// Flatten the nested array structure
-const flatKanjiList: KanjiData[] = (kanjiData as KanjiData[][]).flat();
+const LABEL_START = 101;
+const kanjiList: KanjiData[] = kanjiData as KanjiData[];
 
 const KanjiDetail = () => {
   const { index } = useParams<{ index: string }>();
@@ -17,7 +17,8 @@ const KanjiDetail = () => {
   const { hideJapanese } = useHideJapanese();
   
   const currentIndex = parseInt(index || '0', 10);
-  const kanji = flatKanjiList[currentIndex];
+  const kanji = kanjiList[currentIndex];
+  const labelNumber = LABEL_START + currentIndex;
 
   if (!kanji) {
     navigate('/');
@@ -31,7 +32,7 @@ const KanjiDetail = () => {
   };
 
   const goToNext = () => {
-    if (currentIndex < flatKanjiList.length - 1) {
+    if (currentIndex < kanjiList.length - 1) {
       navigate(`/kanji/${currentIndex + 1}`);
     }
   };
@@ -39,7 +40,7 @@ const KanjiDetail = () => {
   return (
     <div className="min-h-screen bg-background">
       {/* Back button */}
-      <div className="container py-4">
+      <div className="container py-3 sm:py-4">
         <Button
           variant="secondary"
           size="sm"
@@ -55,6 +56,7 @@ const KanjiDetail = () => {
       <main className="container pb-24">
         <FlashCard
           kanji={kanji}
+          labelNumber={labelNumber}
           isBookmarked={isBookmarked(kanji.kanji)}
           onToggleBookmark={() => toggleBookmark(kanji.kanji)}
           hideJapanese={hideJapanese}
@@ -62,30 +64,30 @@ const KanjiDetail = () => {
       </main>
 
       {/* Navigation */}
-      <div className="fixed bottom-0 left-0 right-0 bg-background/80 backdrop-blur-md border-t border-border/50 py-4">
+      <div className="fixed bottom-0 left-0 right-0 bg-background/80 backdrop-blur-md border-t border-border/50 py-3 sm:py-4">
         <div className="container flex items-center justify-between">
           <Button
             variant="default"
             size="icon"
             onClick={goToPrevious}
             disabled={currentIndex === 0}
-            className="rounded-full w-12 h-12"
+            className="rounded-full w-10 h-10 sm:w-12 sm:h-12"
           >
-            <ChevronLeft className="w-6 h-6" />
+            <ChevronLeft className="w-5 h-5 sm:w-6 sm:h-6" />
           </Button>
           
           <span className="text-sm text-muted-foreground">
-            {currentIndex + 1} / {flatKanjiList.length}
+            #{labelNumber} ({currentIndex + 1} / {kanjiList.length})
           </span>
           
           <Button
             variant="default"
             size="icon"
             onClick={goToNext}
-            disabled={currentIndex === flatKanjiList.length - 1}
-            className="rounded-full w-12 h-12"
+            disabled={currentIndex === kanjiList.length - 1}
+            className="rounded-full w-10 h-10 sm:w-12 sm:h-12"
           >
-            <ChevronRight className="w-6 h-6" />
+            <ChevronRight className="w-5 h-5 sm:w-6 sm:h-6" />
           </Button>
         </div>
       </div>

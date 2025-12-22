@@ -7,12 +7,13 @@ import { Button } from './ui/button';
 
 interface FlashCardProps {
   kanji: KanjiData;
+  labelNumber: number;
   isBookmarked: boolean;
   onToggleBookmark: () => void;
   hideJapanese: boolean;
 }
 
-const FlashCard = ({ kanji, isBookmarked, onToggleBookmark, hideJapanese }: FlashCardProps) => {
+const FlashCard = ({ kanji, labelNumber, isBookmarked, onToggleBookmark, hideJapanese }: FlashCardProps) => {
   const [isFlipped, setIsFlipped] = useState(false);
 
   const speak = (text: string) => {
