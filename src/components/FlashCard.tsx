@@ -72,7 +72,6 @@ const FlashCard = ({ kanji, labelNumber, isBookmarked, onToggleBookmark, hideJap
               "shadow-xl border border-border/50",
               "flex flex-col justify-center"
             )}
-            onClick={(e) => e.stopPropagation()}
           >
             <div className="space-y-4">
               <div className="flex items-center gap-3">
