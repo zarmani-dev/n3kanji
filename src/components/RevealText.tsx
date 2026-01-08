@@ -14,9 +14,14 @@ const RevealText = ({ children, hidden, className }: RevealTextProps) => {
     return <span className={className}>{children}</span>;
   }
 
+  const handleClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    setRevealed(!revealed);
+  };
+
   return (
     <button
-      onClick={() => setRevealed(!revealed)}
+      onClick={handleClick}
       className={cn(
         "relative inline-block transition-all duration-300",
         className
