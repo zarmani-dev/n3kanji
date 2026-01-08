@@ -65,12 +65,15 @@ const FlashCard = ({ kanji, labelNumber, isBookmarked, onToggleBookmark, hideJap
           </div>
 
           {/* Back of card - Readings */}
-          <div className={cn(
-            "absolute inset-0 backface-hidden rotate-y-180",
-            "bg-card rounded-2xl p-6 md:p-8",
-            "shadow-xl border border-border/50",
-            "flex flex-col justify-center"
-          )}>
+          <div 
+            className={cn(
+              "absolute inset-0 backface-hidden rotate-y-180",
+              "bg-card rounded-2xl p-6 md:p-8",
+              "shadow-xl border border-border/50",
+              "flex flex-col justify-center"
+            )}
+            onClick={(e) => e.stopPropagation()}
+          >
             <div className="space-y-4">
               <div className="flex items-center gap-3">
                 <span className="text-muted-foreground text-sm w-12">Kun:</span>
