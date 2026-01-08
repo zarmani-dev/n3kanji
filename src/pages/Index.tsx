@@ -1,5 +1,5 @@
 import { useState, useMemo } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import Header from "@/components/Header";
 import KanjiGrid from "@/components/KanjiGrid";
 import { KanjiData } from "@/types/kanji";
@@ -12,9 +12,10 @@ const kanjiList: KanjiData[] = kanjiData as KanjiData[];
 
 const Index = () => {
   const navigate = useNavigate();
+  const [searchParams, setSearchParams] = useSearchParams();
   const { bookmarks, isBookmarked } = useBookmarks();
   const { hideJapanese, toggleHideJapanese } = useHideJapanese();
-  const [showBookmarksOnly, setShowBookmarksOnly] = useState(false);
+  const showBookmarksOnly = searchParams.get('bookmarks') === 'true';
   const [searchValue, setSearchValue] = useState("");
 
   const { displayedKanji, labelNumbers, indexMap } = useMemo(() => {
@@ -57,9 +58,19 @@ const Index = () => {
     };
   }, [showBookmarksOnly, bookmarks, searchValue]);
 
+  const toggleBookmarksOnly = () => {
+    if (showBookmarksOnly) {
+      searchParams.delete('bookmarks');
+    } else {
+      searchParams.set('bookmarks', 'true');
+    }
+    setSearchParams(searchParams);
+  };
+
   const handleKanjiClick = (displayIndex: number) => {
     const actualIndex = indexMap[displayIndex];
-    navigate(`/kanji/${actualIndex}`);
+    const url = showBookmarksOnly ? `/kanji/${actualIndex}?bookmarks=true` : `/kanji/${actualIndex}`;
+    navigate(url);
   };
 
   return (
@@ -68,7 +79,7 @@ const Index = () => {
         hideJapanese={hideJapanese}
         onToggleHideJapanese={toggleHideJapanese}
         showBookmarksOnly={showBookmarksOnly}
-        onToggleBookmarksOnly={() => setShowBookmarksOnly(!showBookmarksOnly)}
+        onToggleBookmarksOnly={toggleBookmarksOnly}
         bookmarkCount={bookmarks.length}
         searchValue={searchValue}
         onSearchChange={setSearchValue}
