@@ -1,10 +1,8 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
-import { Bookmark, Search, X, LogIn, LogOut } from 'lucide-react';
+import { Bookmark, Search, X } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { useAuth } from '@/hooks/useAuth';
 
 interface HeaderProps {
   hideJapanese: boolean;
@@ -26,8 +24,6 @@ const Header = ({
   onSearchChange
 }: HeaderProps) => {
   const [showSearch, setShowSearch] = useState(false);
-  const { user, signOut } = useAuth();
-  const navigate = useNavigate();
 
   return (
     <header className="sticky top-0 z-50 bg-background/80 backdrop-blur-md border-b border-border/50">
@@ -90,25 +86,6 @@ const Header = ({
                   onCheckedChange={onToggleHideJapanese}
                 />
               </div>
-
-              {/* Auth button */}
-              {user ? (
-                <button
-                  onClick={signOut}
-                  className="p-2 rounded-full bg-secondary text-secondary-foreground hover:bg-secondary/80 transition-colors"
-                  title="Sign out"
-                >
-                  <LogOut className="w-4 h-4" />
-                </button>
-              ) : (
-                <button
-                  onClick={() => navigate('/auth')}
-                  className="p-2 rounded-full bg-primary text-primary-foreground hover:bg-primary/90 transition-colors"
-                  title="Sign in to sync bookmarks"
-                >
-                  <LogIn className="w-4 h-4" />
-                </button>
-              )}
             </div>
           </div>
 
