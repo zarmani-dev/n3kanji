@@ -6,6 +6,7 @@ import { KanjiData } from "@/types/kanji";
 import kanjiData from "@/data/n4kanji.json";
 import { useBookmarks } from "@/hooks/useBookmarks";
 import { useHideJapanese } from "@/hooks/useHideJapanese";
+import { useSRS } from "@/hooks/useSRS";
 
 const LABEL_START = 111;
 const kanjiList: KanjiData[] = kanjiData as KanjiData[];
@@ -15,6 +16,7 @@ const Index = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const { bookmarks, isBookmarked } = useBookmarks();
   const { hideJapanese, toggleHideJapanese } = useHideJapanese();
+  const { getDueCount } = useSRS();
   const showBookmarksOnly = searchParams.get('bookmarks') === 'true';
   const [searchValue, setSearchValue] = useState("");
 
@@ -83,6 +85,7 @@ const Index = () => {
         bookmarkCount={bookmarks.length}
         searchValue={searchValue}
         onSearchChange={setSearchValue}
+        dueReviewCount={getDueCount(bookmarks)}
       />
 
       <main className="container py-4 sm:py-6">

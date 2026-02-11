@@ -1,7 +1,8 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
-import { Bookmark, Search, X } from 'lucide-react';
+import { Bookmark, Search, X, Brain } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 interface HeaderProps {
@@ -12,6 +13,7 @@ interface HeaderProps {
   bookmarkCount: number;
   searchValue: string;
   onSearchChange: (value: string) => void;
+  dueReviewCount?: number;
 }
 
 const Header = ({ 
@@ -21,8 +23,10 @@ const Header = ({
   onToggleBookmarksOnly,
   bookmarkCount,
   searchValue,
-  onSearchChange
+  onSearchChange,
+  dueReviewCount = 0
 }: HeaderProps) => {
+  const navigate = useNavigate();
   const [showSearch, setShowSearch] = useState(false);
 
   return (
@@ -60,6 +64,20 @@ const Header = ({
                   </button>
                 )}
               </div>
+
+              {/* Review button */}
+              <button
+                onClick={() => navigate('/review')}
+                className={cn(
+                  "flex items-center gap-1.5 px-2.5 py-1.5 rounded-full text-sm transition-colors",
+                  dueReviewCount > 0
+                    ? "bg-primary text-primary-foreground"
+                    : "bg-secondary text-secondary-foreground"
+                )}
+              >
+                <Brain className="w-4 h-4" />
+                <span>{dueReviewCount}</span>
+              </button>
 
               {/* Bookmarks filter */}
               <button
