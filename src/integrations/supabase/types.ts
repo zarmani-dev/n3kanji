@@ -35,6 +35,39 @@ export type Database = {
         }
         Relationships: []
       }
+      srs_reviews: {
+        Row: {
+          created_at: string
+          ease_factor: number
+          id: string
+          interval_days: number
+          kanji: string
+          last_reviewed: string | null
+          next_review: string
+          repetitions: number
+        }
+        Insert: {
+          created_at?: string
+          ease_factor?: number
+          id?: string
+          interval_days?: number
+          kanji: string
+          last_reviewed?: string | null
+          next_review?: string
+          repetitions?: number
+        }
+        Update: {
+          created_at?: string
+          ease_factor?: number
+          id?: string
+          interval_days?: number
+          kanji?: string
+          last_reviewed?: string | null
+          next_review?: string
+          repetitions?: number
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
