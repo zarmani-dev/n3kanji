@@ -1,9 +1,11 @@
 import { useState } from 'react';
-import { Volume2, Bookmark } from 'lucide-react';
+import { Volume2, Bookmark, Copy, Check } from 'lucide-react';
 import { KanjiData } from '@/types/kanji';
 import { cn } from '@/lib/utils';
 import RevealText from './RevealText';
 import { Button } from './ui/button';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from './ui/dialog';
+import { generateAnkiHTML } from '@/utils/ankiExport';
 
 interface FlashCardProps {
   kanji: KanjiData;
@@ -15,6 +17,15 @@ interface FlashCardProps {
 
 const FlashCard = ({ kanji, labelNumber, isBookmarked, onToggleBookmark, hideJapanese }: FlashCardProps) => {
   const [isFlipped, setIsFlipped] = useState(false);
+  const [copied, setCopied] = useState<'front' | 'back' | null>(null);
+
+  const ankiHTML = generateAnkiHTML(kanji);
+
+  const copyToClipboard = async (text: string, side: 'front' | 'back') => {
+    await navigator.clipboard.writeText(text);
+    setCopied(side);
+    setTimeout(() => setCopied(null), 2000);
+  };
 
   const speak = (text: string) => {
     const utterance = new SpeechSynthesisUtterance(text);
@@ -113,6 +124,61 @@ const FlashCard = ({ kanji, labelNumber, isBookmarked, onToggleBookmark, hideJap
       <p className="text-center text-muted-foreground text-sm mb-8">
         Tap the card to flip
       </p>
+
+      {/* Anki Export Button */}
+      <div className="flex justify-center mb-8">
+        <Dialog>
+          <DialogTrigger asChild>
+            <Button variant="outline" size="sm" className="gap-2">
+              <svg viewBox="0 0 24 24" className="w-4 h-4" fill="currentColor">
+                <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
+              </svg>
+              Copy for Anki
+            </Button>
+          </DialogTrigger>
+          <DialogContent className="max-w-lg max-h-[80vh] overflow-y-auto">
+            <DialogHeader>
+              <DialogTitle>Anki Card HTML — {kanji.kanji}</DialogTitle>
+            </DialogHeader>
+            <div className="space-y-4">
+              <div>
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-sm font-medium text-muted-foreground">Front</span>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="gap-1.5 h-7"
+                    onClick={() => copyToClipboard(ankiHTML.front, 'front')}
+                  >
+                    {copied === 'front' ? <Check className="w-3.5 h-3.5" /> : <Copy className="w-3.5 h-3.5" />}
+                    {copied === 'front' ? 'Copied' : 'Copy'}
+                  </Button>
+                </div>
+                <pre className="bg-muted rounded-lg p-3 text-xs overflow-x-auto whitespace-pre-wrap break-all font-mono text-foreground">
+                  {ankiHTML.front}
+                </pre>
+              </div>
+              <div>
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-sm font-medium text-muted-foreground">Back</span>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="gap-1.5 h-7"
+                    onClick={() => copyToClipboard(ankiHTML.back, 'back')}
+                  >
+                    {copied === 'back' ? <Check className="w-3.5 h-3.5" /> : <Copy className="w-3.5 h-3.5" />}
+                    {copied === 'back' ? 'Copied' : 'Copy'}
+                  </Button>
+                </div>
+                <pre className="bg-muted rounded-lg p-3 text-xs overflow-x-auto whitespace-pre-wrap break-all font-mono text-foreground">
+                  {ankiHTML.back}
+                </pre>
+              </div>
+            </div>
+          </DialogContent>
+        </Dialog>
+      </div>
 
       {/* Vocabulary section */}
       <div className="space-y-4">
