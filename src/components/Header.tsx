@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
-import { Bookmark, Search, X, Brain } from 'lucide-react';
+import { Bookmark, Search, X, Brain, Download } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 interface HeaderProps {
@@ -14,6 +14,7 @@ interface HeaderProps {
   searchValue: string;
   onSearchChange: (value: string) => void;
   dueReviewCount?: number;
+  onExportAnki?: () => void;
 }
 
 const Header = ({ 
@@ -24,7 +25,8 @@ const Header = ({
   bookmarkCount,
   searchValue,
   onSearchChange,
-  dueReviewCount = 0
+  dueReviewCount = 0,
+  onExportAnki
 }: HeaderProps) => {
   const navigate = useNavigate();
   const [showSearch, setShowSearch] = useState(false);
@@ -78,6 +80,18 @@ const Header = ({
                 <Brain className="w-4 h-4" />
                 <span>{dueReviewCount}</span>
               </button>
+
+              {/* Export Anki deck */}
+              {onExportAnki && bookmarkCount > 0 && (
+                <button
+                  onClick={onExportAnki}
+                  className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-full text-sm transition-colors bg-secondary text-secondary-foreground hover:bg-accent"
+                  title="Export bookmarks as Anki deck"
+                >
+                  <Download className="w-4 h-4" />
+                  <span className="hidden sm:inline">Anki</span>
+                </button>
+              )}
 
               {/* Bookmarks filter */}
               <button

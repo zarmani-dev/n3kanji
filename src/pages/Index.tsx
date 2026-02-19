@@ -7,6 +7,7 @@ import kanjiData from "@/data/n4kanji.json";
 import { useBookmarks } from "@/hooks/useBookmarks";
 import { useHideJapanese } from "@/hooks/useHideJapanese";
 import { useSRS } from "@/hooks/useSRS";
+import { downloadAnkiFile } from "@/utils/ankiExport";
 
 const LABEL_START = 111;
 const kanjiList: KanjiData[] = kanjiData as KanjiData[];
@@ -75,6 +76,13 @@ const Index = () => {
     navigate(url);
   };
 
+  const handleExportAnki = () => {
+    const bookmarkedKanjiData = bookmarks
+      .map(k => kanjiList.find(kd => kd.kanji === k))
+      .filter((k): k is KanjiData => k !== undefined);
+    downloadAnkiFile(bookmarkedKanjiData);
+  };
+
   return (
     <div className="min-h-screen bg-background">
       <Header
@@ -86,6 +94,7 @@ const Index = () => {
         searchValue={searchValue}
         onSearchChange={setSearchValue}
         dueReviewCount={getDueCount(bookmarks)}
+        onExportAnki={handleExportAnki}
       />
 
       <main className="container py-4 sm:py-6">
