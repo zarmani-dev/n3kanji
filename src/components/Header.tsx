@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
-import { Bookmark, Search, X, Brain } from 'lucide-react';
+import { Bookmark, Search, X, LayoutGrid } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 interface HeaderProps {
@@ -13,7 +13,6 @@ interface HeaderProps {
   bookmarkCount: number;
   searchValue: string;
   onSearchChange: (value: string) => void;
-  dueReviewCount?: number;
 }
 
 const Header = ({ 
@@ -24,7 +23,6 @@ const Header = ({
   bookmarkCount,
   searchValue,
   onSearchChange,
-  dueReviewCount = 0
 }: HeaderProps) => {
   const navigate = useNavigate();
   const [showSearch, setShowSearch] = useState(false);
@@ -65,18 +63,13 @@ const Header = ({
                 )}
               </div>
 
-              {/* Review button */}
+              {/* My Cards button */}
               <button
-                onClick={() => navigate('/review')}
-                className={cn(
-                  "flex items-center gap-1.5 px-2.5 py-1.5 rounded-full text-sm transition-colors",
-                  dueReviewCount > 0
-                    ? "bg-primary text-primary-foreground"
-                    : "bg-secondary text-secondary-foreground"
-                )}
+                onClick={() => navigate('/custom')}
+                className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-full text-sm transition-colors bg-secondary text-secondary-foreground hover:bg-secondary/80"
               >
-                <Brain className="w-4 h-4" />
-                <span>{dueReviewCount}</span>
+                <LayoutGrid className="w-4 h-4" />
+                <span className="hidden sm:inline">My Cards</span>
               </button>
 
               {/* Bookmarks filter */}
