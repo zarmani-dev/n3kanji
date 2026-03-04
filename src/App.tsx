@@ -5,7 +5,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Index from "./pages/Index";
 import KanjiDetail from "./pages/KanjiDetail";
-import Review from "./pages/Review";
+import CustomCards from "./pages/CustomCards";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -19,7 +19,7 @@ const App = () => (
         <Routes>
           <Route path="/" element={<Index />} />
           <Route path="/kanji/:index" element={<KanjiDetail />} />
-          <Route path="/review" element={<Review />} />
+          <Route path="/custom" element={<CustomCards />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>

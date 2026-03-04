@@ -35,6 +35,36 @@ export type Database = {
         }
         Relationships: []
       }
+      custom_cards: {
+        Row: {
+          created_at: string
+          examples: Json
+          id: string
+          kanji: string
+          kunyomi: string
+          meaning: string
+          onyomi: string
+        }
+        Insert: {
+          created_at?: string
+          examples?: Json
+          id?: string
+          kanji: string
+          kunyomi?: string
+          meaning?: string
+          onyomi?: string
+        }
+        Update: {
+          created_at?: string
+          examples?: Json
+          id?: string
+          kanji?: string
+          kunyomi?: string
+          meaning?: string
+          onyomi?: string
+        }
+        Relationships: []
+      }
       srs_reviews: {
         Row: {
           created_at: string

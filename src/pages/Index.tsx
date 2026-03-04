@@ -6,7 +6,6 @@ import { KanjiData } from "@/types/kanji";
 import kanjiData from "@/data/n4kanji.json";
 import { useBookmarks } from "@/hooks/useBookmarks";
 import { useHideJapanese } from "@/hooks/useHideJapanese";
-import { useSRS } from "@/hooks/useSRS";
 
 const LABEL_START = 111;
 const kanjiList: KanjiData[] = kanjiData as KanjiData[];
@@ -16,13 +15,11 @@ const Index = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const { bookmarks, isBookmarked } = useBookmarks();
   const { hideJapanese, toggleHideJapanese } = useHideJapanese();
-  const { getDueCount } = useSRS();
   const showBookmarksOnly = searchParams.get('bookmarks') === 'true';
   const [searchValue, setSearchValue] = useState("");
 
   const { displayedKanji, labelNumbers, indexMap } = useMemo(() => {
     if (showBookmarksOnly) {
-      // Bookmarks in chronological order with their original labels
       const bookmarkedKanji: KanjiData[] = [];
       const labels: number[] = [];
       const idxMap: number[] = [];
@@ -39,10 +36,8 @@ const Index = () => {
       return { displayedKanji: bookmarkedKanji, labelNumbers: labels, indexMap: idxMap };
     }
 
-    // All kanji with sequential labels starting from 101
     let filtered = kanjiList.map((k, i) => ({ kanji: k, originalIndex: i }));
 
-    // Filter by search
     if (searchValue) {
       const searchNum = parseInt(searchValue, 10);
       if (!isNaN(searchNum)) {
@@ -85,7 +80,6 @@ const Index = () => {
         bookmarkCount={bookmarks.length}
         searchValue={searchValue}
         onSearchChange={setSearchValue}
-        dueReviewCount={getDueCount(bookmarks)}
       />
 
       <main className="container py-4 sm:py-6">
