@@ -1,11 +1,10 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ChevronLeft, Plus, Pencil, Trash2, Copy, Check, Volume2, BookOpen } from 'lucide-react';
+import { ChevronLeft, Plus, Pencil, Trash2, Copy, Check, Volume2, BookOpen, ArrowLeft } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
 import { useCustomCards, CustomCard, CustomExample } from '@/hooks/useCustomCards';
 import { cn } from '@/lib/utils';
 
@@ -124,11 +123,12 @@ const CardForm = ({
   );
 };
 
-// Flashcard view for a custom card
-const CustomFlashCard = ({ card, onEdit, onDelete }: { card: CustomCard; onEdit: () => void; onDelete: () => void }) => {
+// Flashcard detail view
+const CustomFlashCard = ({ card, onEdit, onDelete, onBack }: { card: CustomCard; onEdit: () => void; onDelete: () => void; onBack: () => void }) => {
   const [isFlipped, setIsFlipped] = useState(false);
   const [copied, setCopied] = useState<'front' | 'back' | null>(null);
   const [confirmDelete, setConfirmDelete] = useState(false);
+  const [showAnki, setShowAnki] = useState(false);
 
   const ankiHTML = generateCustomAnkiHTML(card);
 
@@ -145,104 +145,121 @@ const CustomFlashCard = ({ card, onEdit, onDelete }: { card: CustomCard; onEdit:
   };
 
   return (
-    <div className="w-full max-w-2xl mx-auto">
-      {/* Flip card */}
-      <div className="perspective-1000 cursor-pointer mb-6" onClick={() => setIsFlipped(!isFlipped)}>
-        <div className={cn("relative w-full aspect-[4/3] preserve-3d transition-transform duration-500", isFlipped && "rotate-y-180")}>
-          {/* Front */}
-          <div className={cn("absolute inset-0 backface-hidden bg-card rounded-2xl flex flex-col items-center justify-center shadow-xl border border-border/50")}>
-            <span className="text-8xl md:text-9xl font-japanese text-foreground">{card.kanji}</span>
-            {card.meaning && <p className="text-sm text-muted-foreground mt-4">{card.meaning}</p>}
-            {/* Edit / Delete buttons */}
-            <div className="absolute top-4 right-4 flex gap-1">
-              <Button variant="ghost" size="icon" className="w-8 h-8" onClick={e => { e.stopPropagation(); onEdit(); }}>
+    <div className="min-h-screen bg-background">
+      {/* Detail header */}
+      <header className="sticky top-0 z-50 bg-background/80 backdrop-blur-md border-b border-border/50">
+        <div className="container py-3 sm:py-4">
+          <div className="flex items-center justify-between">
+            <Button variant="ghost" size="sm" onClick={onBack} className="gap-1 -ml-2">
+              <ArrowLeft className="w-4 h-4" /> My Cards
+            </Button>
+            <div className="flex items-center gap-1">
+              <Button variant="ghost" size="icon" className="w-9 h-9" onClick={onEdit}>
                 <Pencil className="w-4 h-4" />
               </Button>
-              <Button variant="ghost" size="icon" className="w-8 h-8 text-destructive hover:text-destructive" onClick={e => { e.stopPropagation(); setConfirmDelete(true); }}>
+              <Button variant="ghost" size="icon" className="w-9 h-9 text-destructive hover:text-destructive" onClick={() => setConfirmDelete(true)}>
                 <Trash2 className="w-4 h-4" />
               </Button>
             </div>
           </div>
+        </div>
+      </header>
 
-          {/* Back */}
-          <div className={cn("absolute inset-0 backface-hidden rotate-y-180 bg-card rounded-2xl p-6 md:p-8 shadow-xl border border-border/50 flex flex-col justify-center")}>
-            <div className="space-y-4">
-              {card.kunyomi && (
-                <div className="flex items-center gap-3">
-                  <span className="text-muted-foreground text-sm w-12">Kun:</span>
-                  <span className="text-2xl md:text-3xl font-japanese text-foreground">{card.kunyomi}</span>
+      <div className="container py-4 sm:py-6">
+        <div className="w-full max-w-2xl mx-auto">
+          {/* Flip card */}
+          <div className="perspective-1000 cursor-pointer mb-6" onClick={() => setIsFlipped(!isFlipped)}>
+            <div className={cn("relative w-full aspect-[4/3] preserve-3d transition-transform duration-500", isFlipped && "rotate-y-180")}>
+              {/* Front */}
+              <div className="absolute inset-0 backface-hidden bg-card rounded-2xl flex flex-col items-center justify-center shadow-xl border border-border/50">
+                <span className="text-8xl md:text-9xl font-japanese text-foreground">{card.kanji}</span>
+                {card.meaning && <p className="text-sm text-muted-foreground mt-4">{card.meaning}</p>}
+              </div>
+
+              {/* Back */}
+              <div className="absolute inset-0 backface-hidden rotate-y-180 bg-card rounded-2xl p-6 md:p-8 shadow-xl border border-border/50 flex flex-col justify-center">
+                <div className="space-y-4">
+                  {card.kunyomi && (
+                    <div className="flex items-center gap-3">
+                      <span className="text-muted-foreground text-sm w-12">Kun:</span>
+                      <span className="text-2xl md:text-3xl font-japanese text-foreground">{card.kunyomi}</span>
+                    </div>
+                  )}
+                  {card.onyomi && (
+                    <div className="flex items-center gap-3">
+                      <span className="text-muted-foreground text-sm w-12">On:</span>
+                      <span className="text-2xl md:text-3xl font-japanese text-foreground">{card.onyomi}</span>
+                    </div>
+                  )}
+                  {!card.kunyomi && !card.onyomi && (
+                    <p className="text-muted-foreground text-sm text-center">No readings added</p>
+                  )}
                 </div>
-              )}
-              {card.onyomi && (
-                <div className="flex items-center gap-3">
-                  <span className="text-muted-foreground text-sm w-12">On:</span>
-                  <span className="text-2xl md:text-3xl font-japanese text-foreground">{card.onyomi}</span>
-                </div>
-              )}
+              </div>
             </div>
           </div>
-        </div>
-      </div>
 
-      <p className="text-center text-muted-foreground text-sm mb-8">Tap the card to flip</p>
+          <p className="text-center text-muted-foreground text-sm mb-8">Tap the card to flip</p>
 
-      {/* Actions row */}
-      <div className="flex justify-center mb-8">
-        <Dialog>
-          <DialogTrigger asChild>
-            <Button variant="outline" size="sm" className="gap-2">
+          {/* Anki export button */}
+          <div className="flex justify-center mb-8">
+            <Button variant="outline" size="sm" className="gap-2" onClick={() => setShowAnki(true)}>
               <svg viewBox="0 0 24 24" className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2">
                 <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
               </svg>
               Copy for Anki
             </Button>
-          </DialogTrigger>
-          <DialogContent className="max-w-lg max-h-[80vh] overflow-y-auto">
-            <DialogHeader>
-              <DialogTitle>Anki Card HTML — {card.kanji}</DialogTitle>
-            </DialogHeader>
+          </div>
+
+          {/* Vocabulary */}
+          {card.examples.filter(e => e.j).length > 0 && (
             <div className="space-y-4">
-              {(['front', 'back'] as const).map(side => (
-                <div key={side}>
-                  <div className="flex items-center justify-between mb-2">
-                    <span className="text-sm font-medium text-muted-foreground capitalize">{side}</span>
-                    <Button variant="ghost" size="sm" className="gap-1.5 h-7" onClick={() => copy(ankiHTML[side], side)}>
-                      {copied === side ? <Check className="w-3.5 h-3.5" /> : <Copy className="w-3.5 h-3.5" />}
-                      {copied === side ? 'Copied' : 'Copy'}
+              <h3 className="text-xs uppercase tracking-wider text-muted-foreground font-medium">Vocabulary</h3>
+              <div className="space-y-4">
+                {card.examples.filter(e => e.j).map((example, idx) => (
+                  <div key={idx} className="flex items-start justify-between gap-4 py-3 border-b border-border/30 last:border-0">
+                    <div className="space-y-1 flex-1">
+                      <p className="text-lg font-japanese text-foreground">{example.j}</p>
+                      {example.e && <p className="text-sm text-foreground">{example.e}</p>}
+                      {example.m && <p className="text-xs text-muted-foreground">{example.m}</p>}
+                    </div>
+                    <Button variant="ghost" size="icon" className="shrink-0 text-muted-foreground hover:text-foreground" onClick={() => speak(example.j.split(' ')[0])}>
+                      <Volume2 className="w-5 h-5" />
                     </Button>
                   </div>
-                  <pre className="bg-muted rounded-lg p-3 text-xs overflow-x-auto whitespace-pre-wrap break-all font-mono text-foreground">
-                    {ankiHTML[side]}
-                  </pre>
-                </div>
-              ))}
+                ))}
+              </div>
             </div>
-          </DialogContent>
-        </Dialog>
+          )}
+        </div>
       </div>
 
-      {/* Vocabulary */}
-      {card.examples.filter(e => e.j).length > 0 && (
-        <div className="space-y-4">
-          <h3 className="text-xs uppercase tracking-wider text-muted-foreground font-medium">Vocabulary</h3>
+      {/* Anki dialog */}
+      <Dialog open={showAnki} onOpenChange={setShowAnki}>
+        <DialogContent className="max-w-lg max-h-[80vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>Anki Card HTML — {card.kanji}</DialogTitle>
+          </DialogHeader>
           <div className="space-y-4">
-            {card.examples.filter(e => e.j).map((example, idx) => (
-              <div key={idx} className="flex items-start justify-between gap-4 py-3 border-b border-border/30 last:border-0">
-                <div className="space-y-1 flex-1">
-                  <p className="text-lg font-japanese text-foreground">{example.j}</p>
-                  {example.e && <p className="text-sm text-foreground">{example.e}</p>}
-                  {example.m && <p className="text-xs text-muted-foreground">{example.m}</p>}
+            {(['front', 'back'] as const).map(side => (
+              <div key={side}>
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-sm font-medium text-muted-foreground capitalize">{side}</span>
+                  <Button variant="ghost" size="sm" className="gap-1.5 h-7" onClick={() => copy(ankiHTML[side], side)}>
+                    {copied === side ? <Check className="w-3.5 h-3.5" /> : <Copy className="w-3.5 h-3.5" />}
+                    {copied === side ? 'Copied' : 'Copy'}
+                  </Button>
                 </div>
-                <Button variant="ghost" size="icon" className="shrink-0 text-muted-foreground hover:text-foreground" onClick={() => speak(example.j.split(' ')[0])}>
-                  <Volume2 className="w-5 h-5" />
-                </Button>
+                <pre className="bg-muted rounded-lg p-3 text-xs overflow-x-auto whitespace-pre-wrap break-all font-mono text-foreground">
+                  {ankiHTML[side]}
+                </pre>
               </div>
             ))}
           </div>
-        </div>
-      )}
+        </DialogContent>
+      </Dialog>
 
-      {/* Delete confirm dialog */}
+      {/* Delete confirm */}
       <Dialog open={confirmDelete} onOpenChange={setConfirmDelete}>
         <DialogContent>
           <DialogHeader>
@@ -259,15 +276,29 @@ const CustomFlashCard = ({ card, onEdit, onDelete }: { card: CustomCard; onEdit:
   );
 };
 
+// Grid cell — matches KanjiCell style
+const CustomKanjiCell = ({ card, onClick }: { card: CustomCard; onClick: () => void }) => (
+  <button
+    onClick={onClick}
+    className={cn(
+      "relative aspect-square flex items-center justify-center",
+      "bg-kanji-card hover:bg-kanji-card-hover rounded-lg",
+      "text-2xl sm:text-3xl font-japanese text-foreground",
+      "transition-all duration-200 active:scale-95 hover:shadow-lg",
+      "focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 focus:ring-offset-background"
+    )}
+  >
+    {card.kanji}
+  </button>
+);
+
 const CustomCards = () => {
   const navigate = useNavigate();
   const { cards, loading, createCard, updateCard, deleteCard } = useCustomCards();
-  const [selectedId, setSelectedId] = useState<string | null>(null);
+  const [selectedCard, setSelectedCard] = useState<CustomCard | null>(null);
   const [showForm, setShowForm] = useState(false);
   const [editingCard, setEditingCard] = useState<CustomCard | null>(null);
   const [saving, setSaving] = useState(false);
-
-  const selectedCard = cards.find(c => c.id === selectedId) || cards[0] || null;
 
   const handleSave = async (form: ReturnType<typeof emptyForm>) => {
     setSaving(true);
@@ -280,9 +311,10 @@ const CustomCards = () => {
     };
     if (editingCard) {
       await updateCard(editingCard.id, payload);
+      // refresh selected card data
+      setSelectedCard(prev => prev ? { ...prev, ...payload } : prev);
     } else {
-      const { error } = await createCard(payload);
-      if (!error) setSelectedId(null); // will auto-select first
+      await createCard(payload);
     }
     setSaving(false);
     setShowForm(false);
@@ -296,12 +328,41 @@ const CustomCards = () => {
 
   const handleDelete = async (id: string) => {
     await deleteCard(id);
-    setSelectedId(null);
+    setSelectedCard(null);
   };
 
+  // Detail view
+  if (selectedCard) {
+    const live = cards.find(c => c.id === selectedCard.id) || selectedCard;
+    return (
+      <>
+        <CustomFlashCard
+          key={live.id}
+          card={live}
+          onEdit={() => handleEdit(live)}
+          onDelete={() => handleDelete(live.id)}
+          onBack={() => setSelectedCard(null)}
+        />
+        <Dialog open={showForm} onOpenChange={v => { if (!v) { setShowForm(false); setEditingCard(null); } }}>
+          <DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto">
+            <DialogHeader>
+              <DialogTitle>{editingCard ? `Edit — ${editingCard.kanji}` : 'New Card'}</DialogTitle>
+            </DialogHeader>
+            <CardForm
+              initial={editingCard ? { kanji: editingCard.kanji, kunyomi: editingCard.kunyomi, onyomi: editingCard.onyomi, meaning: editingCard.meaning, examples: editingCard.examples.length ? editingCard.examples : [{ j: '', e: '', m: '' }] } : emptyForm()}
+              onSave={handleSave}
+              onCancel={() => { setShowForm(false); setEditingCard(null); }}
+              saving={saving}
+            />
+          </DialogContent>
+        </Dialog>
+      </>
+    );
+  }
+
+  // Grid view — mirrors Index page layout
   return (
     <div className="min-h-screen bg-background">
-      {/* Header */}
       <header className="sticky top-0 z-50 bg-background/80 backdrop-blur-md border-b border-border/50">
         <div className="container py-3 sm:py-4">
           <div className="flex items-center justify-between">
@@ -310,19 +371,20 @@ const CustomCards = () => {
                 <ChevronLeft className="w-4 h-4" /> Back
               </Button>
               <h1 className="text-lg font-semibold text-foreground">My Cards</h1>
+              {cards.length > 0 && (
+                <span className="text-xs text-muted-foreground bg-muted px-2 py-0.5 rounded-full">
+                  {cards.length}
+                </span>
+              )}
             </div>
-            <Button
-              size="sm"
-              className="gap-1.5"
-              onClick={() => { setEditingCard(null); setShowForm(true); }}
-            >
+            <Button size="sm" className="gap-1.5" onClick={() => { setEditingCard(null); setShowForm(true); }}>
               <Plus className="w-4 h-4" /> New Card
             </Button>
           </div>
         </div>
       </header>
 
-      <div className="container py-4 sm:py-6">
+      <main className="container py-4 sm:py-6">
         {loading ? (
           <div className="flex items-center justify-center py-20">
             <p className="text-muted-foreground">Loading…</p>
@@ -337,62 +399,25 @@ const CustomCards = () => {
             </Button>
           </div>
         ) : (
-          <div className="flex flex-col lg:flex-row gap-6">
-            {/* Sidebar list */}
-            <aside className="lg:w-64 shrink-0">
-              <div className="space-y-2">
-                {cards.map(card => (
-                  <button
-                    key={card.id}
-                    onClick={() => setSelectedId(card.id)}
-                    className={cn(
-                      "w-full flex items-center gap-3 px-4 py-3 rounded-xl text-left transition-colors",
-                      (selectedCard?.id === card.id)
-                        ? "bg-primary text-primary-foreground"
-                        : "bg-card hover:bg-muted border border-border/50"
-                    )}
-                  >
-                    <span className="text-2xl font-japanese">{card.kanji}</span>
-                    <div className="min-w-0">
-                      <p className="text-sm font-medium truncate">{card.meaning || card.kunyomi || card.onyomi || '—'}</p>
-                      {card.kunyomi && (
-                        <p className={cn("text-xs truncate font-japanese", selectedCard?.id === card.id ? "text-primary-foreground/70" : "text-muted-foreground")}>
-                          {card.kunyomi}
-                        </p>
-                      )}
-                    </div>
-                  </button>
-                ))}
-              </div>
-            </aside>
-
-            {/* Main flashcard view */}
-            <main className="flex-1 min-w-0">
-              {selectedCard && (
-                <CustomFlashCard
-                  key={selectedCard.id}
-                  card={selectedCard}
-                  onEdit={() => handleEdit(selectedCard)}
-                  onDelete={() => handleDelete(selectedCard.id)}
-                />
-              )}
-            </main>
+          <div className="grid grid-cols-5 sm:grid-cols-8 md:grid-cols-10 gap-1.5 sm:gap-2 md:gap-3">
+            {cards.map(card => (
+              <CustomKanjiCell
+                key={card.id}
+                card={card}
+                onClick={() => setSelectedCard(card)}
+              />
+            ))}
           </div>
         )}
-      </div>
+      </main>
 
-      {/* Add / Edit form dialog */}
       <Dialog open={showForm} onOpenChange={v => { if (!v) { setShowForm(false); setEditingCard(null); } }}>
         <DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto">
           <DialogHeader>
-            <DialogTitle>{editingCard ? `Edit — ${editingCard.kanji}` : 'New Custom Card'}</DialogTitle>
+            <DialogTitle>{editingCard ? `Edit — ${editingCard.kanji}` : 'New Card'}</DialogTitle>
           </DialogHeader>
           <CardForm
-            key={editingCard?.id ?? 'new'}
-            initial={editingCard
-              ? { kanji: editingCard.kanji, kunyomi: editingCard.kunyomi, onyomi: editingCard.onyomi, meaning: editingCard.meaning, examples: editingCard.examples.length ? editingCard.examples : [{ j: '', e: '', m: '' }] }
-              : emptyForm()
-            }
+            initial={editingCard ? { kanji: editingCard.kanji, kunyomi: editingCard.kunyomi, onyomi: editingCard.onyomi, meaning: editingCard.meaning, examples: editingCard.examples.length ? editingCard.examples : [{ j: '', e: '', m: '' }] } : emptyForm()}
             onSave={handleSave}
             onCancel={() => { setShowForm(false); setEditingCard(null); }}
             saving={saving}
