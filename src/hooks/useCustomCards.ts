@@ -24,7 +24,7 @@ export const useCustomCards = () => {
   const fetchCards = useCallback(async () => {
     setLoading(true);
     const { data, error } = await supabase
-      .from('custom_cards')
+      .from('n3_custom_cards')
       .select('*')
       .order('created_at', { ascending: false });
 
@@ -38,7 +38,7 @@ export const useCustomCards = () => {
 
   const createCard = async (card: Omit<CustomCard, 'id' | 'created_at'>) => {
     const { data, error } = await supabase
-      .from('custom_cards')
+      .from('n3_custom_cards')
       .insert({ ...card, examples: card.examples as unknown as never })
       .select()
       .single();
@@ -50,7 +50,7 @@ export const useCustomCards = () => {
 
   const updateCard = async (id: string, card: Omit<CustomCard, 'id' | 'created_at'>) => {
     const { data, error } = await supabase
-      .from('custom_cards')
+      .from('n3_custom_cards')
       .update({ ...card, examples: card.examples as unknown as never })
       .eq('id', id)
       .select()

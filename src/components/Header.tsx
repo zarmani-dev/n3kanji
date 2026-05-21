@@ -34,7 +34,7 @@ const Header = ({
           {/* Top row */}
           <div className="flex items-center justify-between gap-2">
             <h1 className="text-lg sm:text-xl font-semibold text-foreground truncate">
-              N4 Kanji
+              N3 Kanji
             </h1>
             
             <div className="flex items-center gap-2 sm:gap-4">

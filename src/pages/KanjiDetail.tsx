@@ -4,11 +4,11 @@ import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import FlashCard from '@/components/FlashCard';
 import { KanjiData } from '@/types/kanji';
-import kanjiData from '@/data/n4kanji.json';
+import kanjiData from '@/data/n3kanji.json';
 import { useBookmarks } from '@/hooks/useBookmarks';
 import { useHideJapanese } from '@/hooks/useHideJapanese';
 
-const LABEL_START = 101;
+const LABEL_START = 1;
 const kanjiList: KanjiData[] = kanjiData as KanjiData[];
 
 const KanjiDetail = () => {

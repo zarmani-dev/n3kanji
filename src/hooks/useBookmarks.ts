@@ -1,42 +1,43 @@
 import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 
-const BOOKMARKS_KEY = 'kanji-bookmarks';
+const BOOKMARKS_KEY = 'n3-kanji-bookmarks';
 
 export const useBookmarks = () => {
-  const [bookmarks, setBookmarks] = useState<string[]>(() => {
-    const stored = localStorage.getItem(BOOKMARKS_KEY);
-    return stored ? JSON.parse(stored) : [];
-  });
+  const [bookmarks, setBookmarks] = useState<string[]>([]);
   const [loading, setLoading] = useState(true);
 
-  // Fetch bookmarks from database on mount
-  useEffect(() => {
-    fetchBookmarks();
+  const fetchBookmarks = useCallback(async () => {
+    setLoading(true);
+    const { data, error } = await supabase
+      .from('n3_bookmarks')
+      .select('kanji, created_at')
+      .order('created_at', { ascending: true });
+
+    if (error) {
+      console.error('Failed to fetch N3 bookmarks:', error.message);
+      setBookmarks([]);
+    } else {
+      setBookmarks(data.map(b => b.kanji));
+    }
+    setLoading(false);
   }, []);
 
-  // Sync to localStorage when bookmarks change
+  // Clear legacy N4 localStorage keys & fetch from DB on mount
+  useEffect(() => {
+    localStorage.removeItem('kanji-bookmarks');
+    localStorage.removeItem('n3-kanji-bookmarks');
+    fetchBookmarks();
+  }, [fetchBookmarks]);
+
+  // Sync to localStorage whenever bookmarks change
   useEffect(() => {
     localStorage.setItem(BOOKMARKS_KEY, JSON.stringify(bookmarks));
   }, [bookmarks]);
 
-  const fetchBookmarks = async () => {
-    setLoading(true);
-    const { data, error } = await supabase
-      .from('bookmarks')
-      .select('kanji, created_at')
-      .order('created_at', { ascending: true });
-
-    if (!error && data) {
-      const kanjiList = data.map(b => b.kanji);
-      setBookmarks(kanjiList);
-    }
-    setLoading(false);
-  };
-
   const toggleBookmark = useCallback(async (kanji: string) => {
     const isCurrentlyBookmarked = bookmarks.includes(kanji);
-    
+
     // Optimistic update
     if (isCurrentlyBookmarked) {
       setBookmarks(prev => prev.filter(k => k !== kanji));
@@ -46,18 +47,23 @@ export const useBookmarks = () => {
 
     // Sync with database
     if (isCurrentlyBookmarked) {
-      await supabase
-        .from('bookmarks')
+      const { error } = await supabase
+        .from('n3_bookmarks')
         .delete()
         .eq('kanji', kanji);
+      if (error) console.error('Failed to remove bookmark:', error.message);
     } else {
-      await supabase
-        .from('bookmarks')
+      const { error } = await supabase
+        .from('n3_bookmarks')
         .insert({ kanji });
+      if (error) console.error('Failed to add bookmark:', error.message);
     }
   }, [bookmarks]);
 
-  const isBookmarked = useCallback((kanji: string) => bookmarks.includes(kanji), [bookmarks]);
+  const isBookmarked = useCallback(
+    (kanji: string) => bookmarks.includes(kanji),
+    [bookmarks]
+  );
 
-  return { bookmarks, toggleBookmark, isBookmarked, loading };
+  return { bookmarks, toggleBookmark, isBookmarked, loading, refetch: fetchBookmarks };
 };

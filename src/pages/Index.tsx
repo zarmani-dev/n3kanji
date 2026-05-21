@@ -3,11 +3,11 @@ import { useNavigate, useSearchParams } from "react-router-dom";
 import Header from "@/components/Header";
 import KanjiGrid from "@/components/KanjiGrid";
 import { KanjiData } from "@/types/kanji";
-import kanjiData from "@/data/n4kanji.json";
+import kanjiData from "@/data/n3kanji.json";
 import { useBookmarks } from "@/hooks/useBookmarks";
 import { useHideJapanese } from "@/hooks/useHideJapanese";
 
-const LABEL_START = 111;
+const LABEL_START = 1;
 const kanjiList: KanjiData[] = kanjiData as KanjiData[];
 
 const Index = () => {

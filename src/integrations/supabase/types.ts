@@ -98,6 +98,88 @@ export type Database = {
         }
         Relationships: []
       }
+      // ── N3 App Tables ────────────────────────────────────────
+      n3_bookmarks: {
+        Row: {
+          created_at: string
+          id: string
+          kanji: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          kanji: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          kanji?: string
+        }
+        Relationships: []
+      }
+      n3_srs_reviews: {
+        Row: {
+          created_at: string
+          ease_factor: number
+          id: string
+          interval_days: number
+          kanji: string
+          last_reviewed: string | null
+          next_review: string
+          repetitions: number
+        }
+        Insert: {
+          created_at?: string
+          ease_factor?: number
+          id?: string
+          interval_days?: number
+          kanji: string
+          last_reviewed?: string | null
+          next_review?: string
+          repetitions?: number
+        }
+        Update: {
+          created_at?: string
+          ease_factor?: number
+          id?: string
+          interval_days?: number
+          kanji?: string
+          last_reviewed?: string | null
+          next_review?: string
+          repetitions?: number
+        }
+        Relationships: []
+      }
+      n3_custom_cards: {
+        Row: {
+          created_at: string
+          examples: Json
+          id: string
+          kanji: string
+          kunyomi: string
+          meaning: string
+          onyomi: string
+        }
+        Insert: {
+          created_at?: string
+          examples?: Json
+          id?: string
+          kanji: string
+          kunyomi?: string
+          meaning?: string
+          onyomi?: string
+        }
+        Update: {
+          created_at?: string
+          examples?: Json
+          id?: string
+          kanji?: string
+          kunyomi?: string
+          meaning?: string
+          onyomi?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
